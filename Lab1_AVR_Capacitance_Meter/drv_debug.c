@@ -8,8 +8,6 @@ static uint8_t Drv_Tx_Buff[DRV_DEBUG_TX_BUFF_SIZE];
 static volatile uint8_t Drv_Tx_Head;
 static volatile uint8_t Drv_Tx_Tail;
 
-static void Drv_PutChar(uint8_t Data);
-
 void Drv_Debug_Printf(const char *fmt, ...) {
 	char DataBuff[64] = { 0 };
 	va_list ArgPtr;
@@ -17,7 +15,8 @@ void Drv_Debug_Printf(const char *fmt, ...) {
 	int8_t  ChNbr = 0;
 
 	va_start(ArgPtr, fmt);
-	ChCnt = vsnprintf(DataBuff, 64, fmt, ArgPtr);
+//	ChCnt = vsnprintf(DataBuff, 64, fmt, ArgPtr);
+	ChCnt = vsprintf(DataBuff, fmt, ArgPtr);
 	va_end(ArgPtr);
 
 	do {
@@ -26,7 +25,7 @@ void Drv_Debug_Printf(const char *fmt, ...) {
 	} while(ChNbr < ChCnt);
 }
 
-static void Drv_PutChar(uint8_t Data) {
+void Drv_PutChar(uint8_t Data) {
 	
 	uint8_t Next_Head;
 
