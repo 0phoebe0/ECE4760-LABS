@@ -3,13 +3,13 @@
 
 #include <avr/io.h>
 
-#define LCD_MODE_8BIT  	0
-#define LCD_MODE_4BIT	1
-#define LCD_OP_MODE		LCD_MODE_4BIT
+#define LCD_MODE_8BIT  		0
+#define LCD_MODE_4BIT		1
+#define LCD_OP_MODE			LCD_MODE_4BIT
 
-#define LCD_RS			0
-#define LCD_RW			1
-#define LCD_EN			2
+#define LCD_RS				0
+#define LCD_RW				1
+#define LCD_EN				2
 
 #if 	(LCD_OP_MODE == LCD_MODE_4BIT)
 	#define LCD_CMD_PORT 	PORTC
@@ -27,13 +27,13 @@
 	#define LCD_D3			3
 #endif
 
-#define LCD_D4			4
-#define LCD_D5			5
-#define LCD_D6			6
-#define LCD_D7			7
+#define LCD_D4				4
+#define LCD_D5				5
+#define LCD_D6				6
+#define LCD_D7				7
 
-#define LCD_CMD			0
-#define LCD_DAT			1
+#define LCD_CMD				0
+#define LCD_DAT				1
 
 #define LCD_CLR             0	/*!< DB0: clear display						*/
 #define LCD_HOME            1	/*!< DB1: return to home position			*/
@@ -54,16 +54,16 @@
 #define LCD_CGRAM           6	/*!< DB6: set CG RAM address				*/
 #define LCD_DDRAM           7	/*!< DB7: set DD RAM address				*/
 
-#define LCD_LINE0_DDRAMADDR		0x00
-#define LCD_LINE1_DDRAMADDR		0x40
-#define LCD_LINE2_DDRAMADDR		0x14
-#define LCD_LINE3_DDRAMADDR		0x54
+#define LCD_LINE0_DDRAMADDR	0x00
+#define LCD_LINE1_DDRAMADDR	0x40
+#define LCD_LINE2_DDRAMADDR	0x14
+#define LCD_LINE3_DDRAMADDR	0x54
 
-void Drv_LCD_GotoXY		(uint8_t x, uint8_t y);
-void Drv_LCD_String		(uint8_t *Data, uint8_t nBytes);
-void Drv_LCD_Home		(void);
-void Drv_LCD_Clear		(void);
-void Drv_LCD_Init		(void);
-void Drv_LCD_Printf		(const char *fmt, ...);
+void Drv_LCD_GotoXY			(uint8_t x, uint8_t y);
+void Drv_LCD_String			(uint8_t *Data, uint8_t nBytes);
+void Drv_LCD_Home			(void);
+void Drv_LCD_Clear			(void);
+void Drv_LCD_Init			(void);
+void Drv_LCD_Printf			(const char *fmt, ...);
 
 #endif

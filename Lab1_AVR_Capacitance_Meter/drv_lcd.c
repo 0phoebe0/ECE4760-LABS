@@ -7,8 +7,10 @@
   * @brief   This file provides firmware functions to manage the following 
   *          functionalities of the LCD1602 (HD4408):
   *           - Initialization and Configuration
-  *           - USART0 transmit complete Interrupt Service Routine and
-  *			 	corresponding Call Back Function
+  *           - Set coordinate of the LCD
+  *			  - Clear LCD
+  *			  - Set cursor to home
+  *           - Print out formatted string defined by the user
   *         
   *  @verbatim
   *
@@ -16,21 +18,17 @@
   *                                   How to use this driver
   *          ===================================================================
   *
-  *			 1. Include the "bsp_usart0.h" in driver files;
+  *			 1. Include the "drv_lcd.h" in application files;
   *
-  *          2. Configure Baud Rate parameters in "bsp_usart0.h";
-  *        
-  *          3. Call Bsp_USART0_Init() to initialize the USART0 interface;
-  *
-  *          4. Instantiate the function "USART0_TXC_cbISR()" and add necessary
-  *				operations.
+  *          2. Use Drv_LCD_GotoXY to cooperate with Drv_LCD_Printf to print out
+  *				formatted information defined by user.
   *          
   *  @endverbatim
   *
   ******************************************************************************
   * @attention
   *
-  *	USART0 RX ISR has not been implemented yet.
+  * 8-bit parallel interface has not been implemented.
   *
   * <h2><center>&copy; COPYRIGHT 2014 CORNELL-ECE Wancheng Zhou </center></h2>
   *
@@ -43,7 +41,56 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-void Drv_LCD_SendChar(uint8_t Char) {
+/** @addtogroup AVR_ATMega128_Demo_LCD_Driver
+  * @{
+  */
+
+/** @defgroup LCD
+  * @brief LCD driver modules
+  * @{
+  */ 
+
+/* Private typedef -----------------------------------------------------------*/
+
+/* Private define ------------------------------------------------------------*/
+
+/* Private macro -------------------------------------------------------------*/
+
+/* Private variables ---------------------------------------------------------*/
+
+/* Private function prototypes -----------------------------------------------*/
+
+static void Drv_LCD_SendChar(uint8_t Char);
+static void Drv_LCD_SendCmd	(uint8_t Cmd);
+
+/** @defgroup LCD_Private_Functions
+  * @{
+  */ 
+
+/** @defgroup LCD Printf Functions.
+ *  @brief    output formatted information via LCD module 
+ *
+@verbatim    
+ ===============================================================================
+                      Initialization and Output Functions
+ ===============================================================================  
+  This section provides functions allowing to:
+   - Initialize the USART0 hardware interface;
+   - ISR call back function (weak implementation, need user's instantiation).
+   
+@endverbatim
+  * @{
+  */
+
+/* Private functions ---------------------------------------------------------*/
+
+/**
+  * @brief  Send data to LCD (RS is pulled high while EN is used as clock)
+  * @param  Char: Data need to be sent out.
+  * @retval None
+  */
+
+static void Drv_LCD_SendChar(uint8_t Char) {
 
 #if (LCD_OP_MODE == LCD_MODE_4BIT)
 	LCD_DAT_PORT &= 0x0F;
@@ -65,7 +112,13 @@ void Drv_LCD_SendChar(uint8_t Char) {
 
 }
 
-void Drv_LCD_SendCmd(uint8_t Cmd) {
+/**
+  * @brief  Send command to LCD (RS is pulled down while EN is used as clock)
+  * @param  Cmd: Command need to be sent out.
+  * @retval None
+  */
+
+static void Drv_LCD_SendCmd(uint8_t Cmd) {
 
 #if (LCD_OP_MODE == LCD_MODE_4BIT)
 	LCD_DAT_PORT &= 0x0F;
@@ -84,6 +137,12 @@ void Drv_LCD_SendCmd(uint8_t Cmd) {
 #endif
 
 }
+
+/**
+  * @brief  Initialize the LCD module.
+  * @param  None
+  * @retval None
+  */
 
 void Drv_LCD_Init(void) {
 
@@ -121,13 +180,33 @@ void Drv_LCD_Init(void) {
 
 }
 
+/**
+  * @brief  Clear all information LCD displayed.
+  * @param  None
+  * @retval None
+  */
+
 void Drv_LCD_Clear(void) {
 	Drv_LCD_SendCmd(1 << LCD_CLR);
+
+	return;
 }
+
+/**
+  * @brief  Reset coordinate of LCD.
+  * @param  None
+  * @retval None
+  */
 
 void Drv_LCD_Home(void) {
 	Drv_LCD_SendCmd(1 << LCD_HOME);
 }
+
+/**
+  * @brief  Print out string.
+  * @param  None
+  * @retval None
+  */
 
 void Drv_LCD_String(uint8_t* Data, uint8_t nBytes) {
 
@@ -140,6 +219,12 @@ void Drv_LCD_String(uint8_t* Data, uint8_t nBytes) {
 	}
 }
 
+/**
+  * @brief  Print out user-defined formatted information.
+  * @param  None
+  * @retval None
+  */
+
 void Drv_LCD_Printf(const char *fmt, ...) {
 	char DataBuff[64] = { 0 };
 	va_list ArgPtr;
@@ -151,6 +236,12 @@ void Drv_LCD_Printf(const char *fmt, ...) {
 	
 	Drv_LCD_String((void*)DataBuff, ChCnt);
 }
+
+/**
+  * @brief  Set cursor coordinate of LCD.
+  * @param  None
+  * @retval None
+  */
 
 void Drv_LCD_GotoXY(uint8_t x, uint8_t y) {
 
@@ -166,3 +257,5 @@ void Drv_LCD_GotoXY(uint8_t x, uint8_t y) {
 
 	Drv_LCD_SendCmd((1 << LCD_DDRAM) | DDRAMAddr);
 }
+
+/************************ (C) COPYRIGHT Cornell ECE4760 ********END OF FILE****/
