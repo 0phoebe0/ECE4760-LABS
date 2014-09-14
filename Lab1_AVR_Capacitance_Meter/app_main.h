@@ -3,5 +3,7 @@
 
 #include "bsp.h"
 #include "drv.h"
+#include "app_systick.h"
+#include "app_cap_meas.h"
 
 #endif

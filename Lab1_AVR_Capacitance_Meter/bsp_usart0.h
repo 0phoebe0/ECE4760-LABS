@@ -3,6 +3,8 @@
 
 #include <avr/io.h>
 
+#define F_CPU 16000000UL
+
 #define USART0_BAUD         	9600
 
 #define USART0_ASYNC			0

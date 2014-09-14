@@ -37,6 +37,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "drv_debug.h"
 #include "bsp_usart0.h"
+#include "bsp_tmr0.h"
+#include "bsp_tmr1.h"
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -159,5 +161,14 @@ void USART0_TXC_cbISR(void) {
 
 	return;
 }
+
+/**
+  * @brief  Debug Function Instantiate
+  * @param  user-define
+  * @retval user-define
+  */
+
+
+	
 
 /************************ (C) COPYRIGHT Cornell ECE4760 ********END OF FILE****/
