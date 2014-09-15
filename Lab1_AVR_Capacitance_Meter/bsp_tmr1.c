@@ -10,9 +10,16 @@ void __attribute__((weak)) Bsp_TMR1_CAPT_cbISR( void ) {
 	return;
 }
 
+void __attribute__((weak)) Bsp_TMR1_OVF_cbISR( void ) {
+	return;
+}
+
 ISR (TIMER1_CAPT_vect) {
 	Bsp_TMR1_CAPT_cbISR();
 }
 
+ISR (TIMER1_OVF_vect) {
+	Bsp_TMR1_OVF_cbISR();
+}
 
 
