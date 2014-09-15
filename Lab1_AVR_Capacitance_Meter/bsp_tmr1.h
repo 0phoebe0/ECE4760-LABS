@@ -6,7 +6,7 @@
 #define TMR1_ENABLE_CAPT_ISR()	TIMSK1 |=  (1 << ICIE1)
 #define TMR1_ENABLE_OVF_ISR()	TIMSK1 |=  (1 << TOIE1)
 #define TMR1_DISABLE_CAPT_ISR()	TIMSK1 &= ~(1 << ICIE1)
-#define TMR1_DISABLE_OVF_ISR()	TIMSK1 |=  (1 << TOIE1)
+#define TMR1_DISABLE_OVF_ISR()	TIMSK1 &= ~(1 << TOIE1)
 
 #define TMR1_CLR_TCNT1()		TCNT1	= 0
 #define TMR1_CLR_ICR1()			ICR1	= 0

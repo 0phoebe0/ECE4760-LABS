@@ -53,8 +53,8 @@ int main(void) {
 	
 	TMR0_CLR_CNTR();
 	TMR0_ENABLE_ISR();
-	TMR1_ENABLE_CAPT_ISR();	
-	TMR1_ENABLE_OVF_ISR();
+//	TMR1_ENABLE_CAPT_ISR();
+//	TMR1_ENABLE_OVF_ISR();
 //	ACOMP_ENABLE_ISR();
 
 	App_Task_Register();

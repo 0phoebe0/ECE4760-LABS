@@ -9,10 +9,12 @@
 #include <string.h>
 #include <avr/io.h>
 
-static uint8_t	Cap_Measure_Stage = STATE_IDLE;
-static bool		Cap_DisChargeOK	  = false;
-static bool		Cap_ICP_OK		  = false;
-static bool     Cap_MeasOVF		  = false;
+static uint8_t			Cap_Measure_Stage 	= STATE_IDLE;
+static bool				Cap_DisChargeOK		= false;
+static volatile uint8_t Cap_OVF_Cntr 		= 0;
+static volatile bool 	Cap_ICP_OK	 		= false;
+static volatile bool 	Cap_MeasOVF  		= false;
+
 static uint16_t Cap_ChargeTime	  = 0;
 static float    Cap_TimeMs		  = 0.0f;
 static float    Cap_Value		  = 0.0f;
@@ -144,10 +146,15 @@ void App_Cap_Measure_Task(bool MeasCtrl) {
 
 		case STATE_CHARGE:
 			Drv_Debug_Printf("Start Charge\r\n");	
+			
+			TMR1_ENABLE_CAPT_ISR();	
+			TMR1_ENABLE_OVF_ISR();
+			TMR1_CLR_TCNT1();
+			TMR1_CLR_ICR1();
 			Cap_ICP_OK = false;
 			Cap_MeasOVF = false;
-			TMR1_CLR_TCNT1();
-			TMR1_CLR_ICR1();	
+			Cap_OVF_Cntr = 0;
+
 			if(CurrUnit == MEAS_UNIT_NF) {
 				CAP_CHARGE_R_LARGE();
 			}
@@ -160,13 +167,15 @@ void App_Cap_Measure_Task(bool MeasCtrl) {
 		case STATE_CALC:
 			if (Cap_ICP_OK) {
 				Cap_ICP_OK = false;	
+				Cap_ChargeTime = Cap_ChargeTime + 65536 * Cap_OVF_Cntr;
+				if (Cap_MeasOVF) Drv_Debug_Printf("OverFlow! Cap_OVF_Cntr:%d\r\n", Cap_OVF_Cntr);
 				Drv_Debug_Printf("ICR1 = %x\r\n", Cap_ChargeTime);
-				if (Cap_ChargeTime < 20) {
+				if (Cap_ChargeTime < 27) {
 					CapPushFlag = false;
 					LCDDispStat = LCD_CAP_NULL;
 					Drv_Debug_Printf("No cap!\r\n");
 				}
-				else if ((Cap_ChargeTime >= 20 ) && (Cap_ChargeTime < 40  )) {
+				else if ((Cap_ChargeTime >= 27 ) && (Cap_ChargeTime < 60  )) {
 					CapPushFlag = false;
 					LCDDispStat = LCD_CAP_TOOSMALL;
 					Drv_Debug_Printf("Too Small!\r\n");
@@ -209,17 +218,25 @@ void App_Cap_Measure_Task(bool MeasCtrl) {
 				}		
 	
 				Cap_Measure_Stage = STATE_IDLE;
+			}
+			else if (Cap_OVF_Cntr >= 3) {
+				Drv_Debug_Printf("TimeOut\r\n");
+				TMR1_DISABLE_CAPT_ISR();
+				TMR1_DISABLE_OVF_ISR();
+				Cap_Measure_Stage = STATE_IDLE;
 			}			
 			break;
-
 	}
 }
 
 void Bsp_TMR1_CAPT_cbISR(void) {
 	Cap_ICP_OK = true;
 	Cap_ChargeTime = ICR1;
+	TMR1_DISABLE_CAPT_ISR();
 }
 
 void Bsp_TMR1_OVF_cbISR(void) {
+	Cap_OVF_Cntr ++;
 	Cap_MeasOVF = true;
+	TMR1_DISABLE_OVF_ISR();
 }

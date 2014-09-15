@@ -8,9 +8,16 @@
    The capacitance measure range is actually defined
    by time measuring range, let's assume time measuring
    range is 6.25uS~625uS (100 - 10000 @ 16MHz of TMR1).
+	
+   Assume the initial voltage on capacitor is 0, then the
+   calculation equation is:
+   t = R * C * ln(2).
 
    Use 10K to charge: 0.901684nF < C < 90.1684nF
    Use 100 to charge: 0.090168uF < C < 9.01684uF
+
+   The Maximum time that TMR1 can accumulate is 65536 * 6250ns = 4.096ms.
+   So, the maximum capacitor that TMR1 can measure without overflow is: 59uF.
 
    Default, we use 10K to charge, if we found that the TMR1
    Input capture value is larger than 10,000, siwtch range
