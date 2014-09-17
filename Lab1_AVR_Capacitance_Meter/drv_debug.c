@@ -121,7 +121,7 @@ void Drv_Debug_Printf(const char *fmt, ...) {
   * @param  Data: 8-bit data needed to output.
   * @retval None
   */
-
+#if (USART0_WORK_MODE == USART0_MODE_INTERRUPT)
 static void Drv_PutChar(uint8_t Data) {
 	
 	uint8_t Next_Head;
@@ -147,6 +147,14 @@ static void Drv_PutChar(uint8_t Data) {
 
 	return;
 }
+#else
+static void Drv_PutChar(uint8_t Data) {
+	
+	while((UCSR0A & (1 << UDRE0)) == 0);
+	UDR0 = Data;
+	
+}
+#endif
 
 /**
   * @brief  USART0 Transmit Complete Call Back Function

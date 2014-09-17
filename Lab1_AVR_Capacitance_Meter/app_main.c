@@ -48,7 +48,7 @@ int main(void) {
 	
 	TMR1_ENABLE_CAPT_ISR();
 	TMR1_ENABLE_OVF_ISR();
-//	ACOMP_ENABLE_ISR();
+	ACOMP_ENABLE_ISR();
 
 	App_Task_Register();
 

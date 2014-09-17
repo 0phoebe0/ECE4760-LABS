@@ -102,11 +102,17 @@ void Bsp_USART0_Init(void) {
 #else
 	UCSR0A |= (1 << U2X0);
 #endif
-	
+
 	/* 0xD8: RX Interrupt & TX Interrupt */
 	UCSR0B &= ~ (1 << UCSZ02 );
-	UCSR0B |=  ((1 << RXCIE0 ) | (1 << TXCIE0 ) | 
-			    (1 << RXEN0  ) | (1 << TXEN0  ));   
+
+#if (USART0_WORK_MODE == USART0_MODE_INTERRUPT)
+	UCSR0B |=  ((0 << RXCIE0 ) | (1 << TXCIE0 ) | 
+			    (0 << RXEN0  ) | (1 << TXEN0  )); 
+#else
+	UCSR0B |=  ((0 << RXCIE0 ) | (0 << TXCIE0 ) | 
+			    (0 << RXEN0  ) | (1 << TXEN0  )); 
+#endif  
 	
 	/* 0x06: Async Mode, 8-bit Data, 1-bit STO */
 	UCSR0C &= ~((1 << UMSEL01) | (1 << UMSEL00) |
