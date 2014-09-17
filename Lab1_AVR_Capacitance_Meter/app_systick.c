@@ -21,27 +21,35 @@ void App_SysTaskMgMt_Init(SysTaskMgMt_t *TaskMgMtItem) {
 }
 
 void App_Task_Exec(void) {
-	int8_t RdyIndex;
-	for(RdyIndex = (SYS_TASK_COUNT - 1); RdyIndex >= 0; RdyIndex--) {
-		if (SysTaskMgMt_Arr[RdyIndex]->SysTaskFlag == true) {
-			SysTaskMgMt_Arr[RdyIndex]->SysTaskFlag = false;
-			if((SysTaskMgMt_Arr[RdyIndex]->SysTaskRun == true) &&
-		   	   (SysTaskMgMt_Arr[RdyIndex]->SysFunction != 0))
-				SysTaskMgMt_Arr[RdyIndex]->SysFunction();
+
+	uint8_t RdyIndex = 0;
+
+	for(RdyIndex = 0; RdyIndex < SYS_TASK_COUNT; RdyIndex++) {
+		if (SysTaskMgMt_Arr[RdyIndex] != 0) {
+			if (SysTaskMgMt_Arr[RdyIndex]->SysTaskFlag == true) {
+				SysTaskMgMt_Arr[RdyIndex]->SysTaskFlag = false;
+				if((SysTaskMgMt_Arr[RdyIndex]->SysTaskRun == true) &&
+			   	   (SysTaskMgMt_Arr[RdyIndex]->SysFunction != 0))
+					SysTaskMgMt_Arr[RdyIndex]->SysFunction();
+			}
 		}
 	}
 }
 
+
 void Bsp_TMR0_CTC_cbISR(void) {
 
 	uint8_t TaskScan;
-
+	
 	for(TaskScan = 0; TaskScan < SYS_TASK_COUNT; TaskScan++) {
-		if (SysTaskMgMt_Arr[TaskScan]->SysTaskTimeMs != 0)
-		    SysTaskMgMt_Arr[TaskScan]->SysTaskTimeMs --;
-		else {
-			SysTaskMgMt_Arr[TaskScan]->SysTaskFlag = true;
-			SysTaskMgMt_Arr[TaskScan]->SysTaskTimeMs = TaskTimeRec[TaskScan];
+
+		if (SysTaskMgMt_Arr[TaskScan] != 0) {
+			if (SysTaskMgMt_Arr[TaskScan]->SysTaskTimeMs != 0)
+			    SysTaskMgMt_Arr[TaskScan]->SysTaskTimeMs --;
+			else {
+				SysTaskMgMt_Arr[TaskScan]->SysTaskFlag = true;
+				SysTaskMgMt_Arr[TaskScan]->SysTaskTimeMs = TaskTimeRec[TaskScan];
+			}
 		}
 	}
 }

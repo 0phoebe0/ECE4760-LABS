@@ -41,20 +41,21 @@ int main(void) {
 	Drv_LCD_GotoXY(0, 0);
 	Drv_LCD_String((void*)"CORNELL ECE-4760", 16);
 
-	sei();
 //	cli();
 
 	Drv_Debug_Printf("Hello, AVR!\r\n");
-	
+
 	TMR1_ENABLE_CAPT_ISR();
 	TMR1_ENABLE_OVF_ISR();
-	ACOMP_ENABLE_ISR();
+//	ACOMP_ENABLE_ISR();
 
 	App_Task_Register();
 
-	TMR0_START_COUNT();
 	TMR0_CLR_CNTR();
+	TMR0_START_COUNT();
 	TMR0_ENABLE_ISR();
+
+	sei();
 	
 	while(1) {
 		App_Task_Exec();

@@ -18,6 +18,10 @@ void Drv_LED_Toggle(void) {
 	#endif
 }
 
+void Drv_LED_On(void) {
+	DRV_LED_PORT &= ~(1 << DRV_LED_PIN_NBR);
+}
+
 
 
 

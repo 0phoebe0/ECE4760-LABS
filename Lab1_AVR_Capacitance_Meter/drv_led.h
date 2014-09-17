@@ -9,5 +9,6 @@
 
 void Drv_LED_Init	(void);
 void Drv_LED_Toggle	(void);
+void Drv_LED_On		(void);
 
 #endif

@@ -10,7 +10,7 @@ void Bsp_TMR0_Init(void) {
 	OCR0A = TMR0_OCR_VALUE;
 	OCR0B = 0x00;
 
-	TIMSK0 =(0 << OCIE0B) | (1 << OCIE0A) | (0 << TOIE0);
+	TIMSK0 = (0 << OCIE0B) | (1 << OCIE0A) | (0 << TOIE0);
 }
 
 void __attribute((weak)) Bsp_TMR0_CTC_cbISR(void) {

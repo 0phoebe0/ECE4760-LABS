@@ -7,7 +7,7 @@
 
 #define SYS_HEARTBEAT_INTERVAL_MS		1000
 
-#define SYS_TASK_COUNT					4
+#define SYS_TASK_COUNT					5
 
 typedef void (*SysFNCT)(void);
 
