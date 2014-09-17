@@ -14,6 +14,9 @@
 #define TMR0_ENABLE_ISR()		TIMSK0 |= (1 << OCIE0A )
 #define TMR0_CLR_CNTR()			TCNT0 = 0
 
+#define TMR0_STOP_COUNT()		TCCR0B &= ~((1 << CS02  ) | (1 << CS01) | ( 1 << CS00))
+#define TMR0_START_COUNT()		TCCR0B |=  ((0 << CS02  ) | (1 << CS01) | ( 1 << CS00))
+
 void Bsp_TMR0_Init			(void);
 void Bsp_TMR0_CTC_cbISR		(void);
 

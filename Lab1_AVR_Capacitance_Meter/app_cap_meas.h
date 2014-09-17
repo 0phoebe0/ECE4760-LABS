@@ -27,13 +27,21 @@
 #define CAP_TM_BUFF_SIZE		32
 #define CAP_TM_BUFF_SIZE_MSK	(CAP_TM_BUFF_SIZE - 1)	
 
+#define CAP_NULL_ICP_LARGE_RES	0x1B     	/* Actual Value: 920ns - No Cap Large Resistor */
+#define CAP_NULL_ICP_SMALL_RES	0x1B	 	/* Actual Value: 60ns */
+
+#define CAP_ICP_NORMAL_MIN		100			/* Change the range to expand measuring range */
+#define CAP_ICP_NORMAL_MAX		20000
+
 #define LN_TWO					(float)0.693147f
 #define R_LARGE					10000
 #define R_SMALL					100
 #define F_CPU_MICRO				(float)((float)(F_CPU) / 1000000.0f)
 
 #define CAP_DISCHARGE() {		\
-		DDRB  |=  (1 << 0);		\
+		DDRB  |=  (1 << 2);		\
+		PORTB &= ~(1 << 2);		\
+		DDRB  &= ~(1 << 0);		\
 		PORTB &= ~(1 << 0);		\
 }
 
@@ -42,7 +50,9 @@
 
 #define CAP_CHARGE_R_LARGE() {	\
 		DDRB  &= ~(1 << 2); 	\
+		PORTB &= ~(1 << 2);		\
 		DDRB  &= ~(1 << 0);		\
+		PORTB &= ~(1 << 0);		\
 }
 
 /* PORTB.0 Push pull while PORTB.2 remains input */
@@ -74,7 +84,7 @@ typedef enum {
 } Cap_MeasureUnit_t;
 
 void App_Cap_DisChargeDone	(void);
-void App_Cap_Measure_Task	(bool MeasCtrl);
+void App_Cap_Measure_Task	(void);
 void App_Cap_LCD_Refresh	(void);
 #endif
 

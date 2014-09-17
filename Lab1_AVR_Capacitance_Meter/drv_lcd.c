@@ -36,7 +36,10 @@
   */ 
 
 /* Includes ------------------------------------------------------------------*/
+#define  F_CPU               16000000UL
+
 #include "drv_lcd.h"
+#include <avr/interrupt.h>
 #include <util/delay.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -174,8 +177,8 @@ void Drv_LCD_Init(void) {
 
 	Drv_LCD_SendCmd(0x28);
 	Drv_LCD_SendCmd(0x0C);
-	Drv_LCD_SendCmd(0x06);
-	Drv_LCD_SendCmd(0x01);
+//	Drv_LCD_SendCmd(0x06);
+//	Drv_LCD_SendCmd(0x01);
 #endif
 
 }
@@ -188,7 +191,6 @@ void Drv_LCD_Init(void) {
 
 void Drv_LCD_Clear(void) {
 	Drv_LCD_SendCmd(1 << LCD_CLR);
-
 	return;
 }
 
@@ -208,7 +210,7 @@ void Drv_LCD_Home(void) {
   * @retval None
   */
 
-void Drv_LCD_String(uint8_t* Data, uint8_t nBytes) {
+void Drv_LCD_String(char* Data, uint8_t nBytes) {
 
 	uint8_t BytePos;
 
@@ -229,12 +231,12 @@ void Drv_LCD_Printf(const char *fmt, ...) {
 	char DataBuff[64] = { 0 };
 	va_list ArgPtr;
 	int8_t  ChCnt;
-
+	
 	va_start(ArgPtr, fmt);
 	ChCnt = vsnprintf(DataBuff, 64, fmt, ArgPtr);
 	va_end(ArgPtr);
 	
-	Drv_LCD_String((void*)DataBuff, ChCnt);
+	Drv_LCD_String(DataBuff, ChCnt);
 }
 
 /**

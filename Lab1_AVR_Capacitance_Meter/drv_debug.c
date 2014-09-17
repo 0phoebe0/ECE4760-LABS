@@ -141,6 +141,8 @@ static void Drv_PutChar(uint8_t Data) {
 			Drv_Tx_Buff[Drv_Tx_Head] = Data;
 			Drv_Tx_Head = Next_Head;
 		}
+		else
+			while(!IS_USART0_UDR_EMPTY());
 	}
 
 	return;

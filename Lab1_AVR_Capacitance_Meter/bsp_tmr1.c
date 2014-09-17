@@ -2,7 +2,8 @@
 #include <avr/interrupt.h>
 
 void Bsp_TMR1_Init(void) {
-	TCCR1B = (1 << ICES1) | (1 << CS10);	/* No prescaling, full CPU clock 	*/
+//	TCCR1B = (1 << ICES1) | (1 << CS10);	/* No prescaling, full CPU clock 	*/
+	TCCR1B = (1 << ICES1) | (0 << CS10);	/* Stop Counting Firstly 			*/
 //	TIMSK1 = (1 << ICIE1);					/* Enable Input Capture 			*/
 }
 

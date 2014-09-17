@@ -10,6 +10,8 @@
 
 #define TMR1_CLR_TCNT1()		TCNT1	= 0
 #define TMR1_CLR_ICR1()			ICR1	= 0
+#define TMR1_STOP_COUNT()		TCCR1B &= ~(1 << CS10);
+#define TMR1_START_COUNT()		TCCR1B |= (1 << CS10);
 
 void Bsp_TMR1_Init				(void);
 void Bsp_TMR1_CAPT_cbISR		(void);

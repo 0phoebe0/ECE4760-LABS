@@ -60,7 +60,7 @@
 #define LCD_LINE3_DDRAMADDR	0x54
 
 void Drv_LCD_GotoXY			(uint8_t x, uint8_t y);
-void Drv_LCD_String			(uint8_t *Data, uint8_t nBytes);
+void Drv_LCD_String			(char *Data, uint8_t nBytes);
 void Drv_LCD_Home			(void);
 void Drv_LCD_Clear			(void);
 void Drv_LCD_Init			(void);
