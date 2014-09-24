@@ -42,9 +42,11 @@ void Bsp_TMR0_CTC_cbISR(void) {
 	uint8_t TaskScan;
 	
 	for(TaskScan = 0; TaskScan < SYS_TASK_COUNT; TaskScan++) {
+		
+		/*!> Before we access the pointer, we need to make sure it is not NULL!      */
 
-		if (SysTaskMgMt_Arr[TaskScan] != 0) {
-			if (SysTaskMgMt_Arr[TaskScan]->SysTaskTimeMs != 0)
+		if (SysTaskMgMt_Arr[TaskScan] != 0) {					/*!> Very important! */
+			if (SysTaskMgMt_Arr[TaskScan]->SysTaskTimeMs != 0)	
 			    SysTaskMgMt_Arr[TaskScan]->SysTaskTimeMs --;
 			else {
 				SysTaskMgMt_Arr[TaskScan]->SysTaskFlag = true;
