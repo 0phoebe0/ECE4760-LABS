@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Atmel Studio Solution File, Format Version 11.00
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "AVR_CricketCall", "AVR_CricketCall.cproj", "{4195682D-5E2F-4974-8170-22674007702A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4195682D-5E2F-4974-8170-22674007702A}.Debug|AVR.ActiveCfg = Debug|AVR
+		{4195682D-5E2F-4974-8170-22674007702A}.Debug|AVR.Build.0 = Debug|AVR
+		{4195682D-5E2F-4974-8170-22674007702A}.Release|AVR.ActiveCfg = Release|AVR
+		{4195682D-5E2F-4974-8170-22674007702A}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
