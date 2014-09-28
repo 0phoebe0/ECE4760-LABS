@@ -13,6 +13,14 @@
 #define SINE_RAMP_DOWN_START	625     /* 10 Complete sine waves: 40 ms */
 #define SINE_RAMP_DOWN_END		875		/* 14 Complete sine waves: 56 ms */
 
+typedef enum {
+	SYLLABLE_INIT = (0),
+	SYLLABLE_PREP = (1),
+	SYLLABLE_PLAY = (2),
+	SYLLABLE_OVER = (3),
+	SYLLABLE_STOP = (4)
+} syllableplay_t;
+
 void App_DDS_Init(void);
 void App_DDS_Para_Calc(void);
 void App_DDS_Task_Exec(void);

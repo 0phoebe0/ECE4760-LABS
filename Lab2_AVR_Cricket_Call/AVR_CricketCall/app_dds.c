@@ -3,25 +3,28 @@
 #include <math.h>
 #include <stdbool.h>
 
-static uint16_t		SysIndCntr;
-static int8_t		sineTable[256];
-static uint8_t		rampTable[256];
+static uint16_t				SysIndCntr;							/*!> System Running Indicator	*/
+static int8_t				sineTable[256];						/*!> sine wave local table		*/
+static uint8_t				rampTable[256];						/*!> Ramp up / down table		*/
+static syllableplay_t		dds_play_status = SYLLABLE_INIT;	/*!> State Machine Variable		*/
 
-volatile uint32_t	dds_accumulator;
-volatile uint8_t	dds_accum_high8;
+static volatile uint32_t	dds_accumulator;					/*!> DDS accumulator			*/
+static volatile uint8_t		dds_accum_high8;					/*!> Adjustment to get sine val */
 
-volatile uint8_t    rampt_index;
-volatile uint16_t   sample_cntr;
+static volatile uint8_t		rampt_index;
+static volatile uint16_t	sample_cntr;
 
-volatile uint32_t   syllable_tmr_count;
-volatile uint32_t   chirp_tmr_count;
+static volatile uint32_t	syllable_tmr_count;
+static volatile bool		dds_synthesis_flag = true;
 
 /* All units must be in millisecond and frequency in Hertz unit! */
-uint16_t chirp_rept_interval;
-uint8_t  syllable_number;
-uint8_t  syllable_duration;			/*!> sine wave quantity in one syllable	*/
-uint8_t  syllable_rept_interval;	
-uint16_t burst_freq;				/*!> calculate DDS Increment			*/
+
+									/*!>	Description				   Unit			*/
+uint16_t chirp_rept_interval;		/*!> chirp repeat interval:			ms			*/
+uint8_t  syllable_number;			/*!> syllable number in a chirp					*/
+uint8_t  syllable_duration;			/*!> syllable duration (length)		ms			*/
+uint8_t  syllable_rept_interval;	/*!> syllable repeat interval       ms			*/
+uint16_t burst_freq;				/*!> burst frequency				Hz			*/
 
 uint32_t dds_increment;
 uint16_t sines_per_syllable;
@@ -38,7 +41,7 @@ void App_DDS_Init(void) {
 	for (sineIndex = 0; sineIndex < 256; sineIndex++)
 	{
 		/*!> Generate sinewave table which contains 256 sample points */
-		sineTable[sineIndex] = (uint8_t)(127.0f * sin(6.283 * ((float)sineIndex) / 256.0f));
+		sineTable[sineIndex] = (uint8_t)(127.0f * sin(6.283f * ((float)sineIndex) / 256.0f));
 		
 		/*!> Please take care of the range! should not exceed 128! */
 		rampTable[sineIndex] = (sineIndex >> 1);
@@ -47,14 +50,14 @@ void App_DDS_Init(void) {
 
 void App_DDS_Para_Calc(void) {
 	
-	chirp_rept_interval = 1500;
-	syllable_number = 10;
-	syllable_duration = 10;
-	syllable_rept_interval = 50;
+	/*!> Following parameters should be got from user input! */
+	chirp_rept_interval		= 1500;		
+	syllable_number			= 5;
+	syllable_duration		= 20;
+	syllable_rept_interval	= 50;
+	burst_freq				= 2500;
 	
 	/*!> Must do some kind of verification to check whether the parameters are right */
-	
-	burst_freq = 3000;
 	
 	dds_increment = (DDS32_INCREMENT / 1000) * burst_freq;
 	sines_per_syllable = (uint16_t)(syllable_duration * burst_freq / 1000);  /* Do not need control */
@@ -63,17 +66,6 @@ void App_DDS_Para_Calc(void) {
 	
 	Drv_Debug_Printf("dds_increment: %ld, ramp_down_sta: %d, ramp_down_sto: %d\r\n", dds_increment, ramp_down_sta, ramp_down_sto);
 } 
-
-typedef enum {
-	SYLLABLE_INIT = (0),
-	SYLLABLE_PREP = (1),
-	SYLLABLE_PLAY = (2),
-	SYLLABLE_OVER = (3),
-	SYLLABLE_STOP = (4)
-} syllableplay_t;
-
-static syllableplay_t dds_play_status = SYLLABLE_INIT;
-volatile bool dds_synthesis_flag = true;
 
 void App_DDS_PlaySyllable(void) {
 	
