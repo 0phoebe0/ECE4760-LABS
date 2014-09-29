@@ -3,6 +3,8 @@
 #include <math.h>
 #include <stdbool.h>
 
+extern volatile uint16_t	tmr_counter;
+
 static uint16_t				SysIndCntr;							/*!> System Running Indicator	*/
 static int8_t				sineTable[256];						/*!> sine wave local table		*/
 static uint8_t				rampTable[256];						/*!> Ramp up / down table		*/
@@ -55,7 +57,7 @@ void App_DDS_Para_Calc(void) {
 	syllable_number			= 5;
 	syllable_duration		= 20;
 	syllable_rept_interval	= 50;
-	burst_freq				= 2500;
+	burst_freq				= 4000;
 	
 	/*!> Must do some kind of verification to check whether the parameters are right */
 	
@@ -78,8 +80,6 @@ void App_DDS_PlaySyllable(void) {
 			syllable_play_cntr = 0;
 			dds_accumulator = 0;
 			dds_synthesis_flag = false;
-			TMR0_START_COUNT();
-			TMR0_ENABLE_OVF_ISR();
 			dds_play_status = SYLLABLE_PREP;
 		break;
 		
@@ -154,6 +154,8 @@ void Bsp_TMR0_OVF_cbISR(void) {
 		OCR0A = 128;
 	
 	syllable_tmr_count ++;
+	
+	tmr_counter ++;
 	
 	if (++SysIndCntr == 62500) {
 		Drv_LED_Toggle();

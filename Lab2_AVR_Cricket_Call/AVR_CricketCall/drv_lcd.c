@@ -111,6 +111,15 @@ static void Drv_LCD_SendChar(uint8_t Char) {
 	LCD_CMD_PORT &= ~(1 << LCD_EN);			/*!> Clear EN firstly to send data  */
 	LCD_CMD_PORT &= ~(1 << LCD_RS);			/*!> Clear RS & EN    				*/
 	_delay_ms(2);							/*!> Essential delay				*/
+
+#elif (LCD_OP_MODE == LCD_MODE_8BIT)
+	LCD_DAT_PORT = Char;
+	LCD_CMD_PORT |=  (1 << LCD_RS);
+	LCD_CMD_PORT |=  (1 << LCD_EN);
+	_delay_ms(2);
+	LCD_CMD_PORT &= ~(1 << LCD_EN);
+	LCD_CMD_PORT &= ~(1 << LCD_RS);	
+	_delay_ms(2);
 #endif
 
 }
@@ -137,9 +146,29 @@ static void Drv_LCD_SendCmd(uint8_t Cmd) {
 	_delay_ms(2);							/*!> Essential delay				*/
 	LCD_CMD_PORT &= ~(1 << LCD_EN);
 	_delay_ms(2);							/*!> Essential delay				*/
+
+#elif (LCD_OP_MODE == LCD_MODE_8BIT)
+	LCD_DAT_PORT = Cmd;
+	LCD_CMD_PORT |= (1 << LCD_EN);
+	_delay_ms(2);
+	LCD_CMD_PORT &= ~(1 << LCD_EN);
+	_delay_ms(2);
+
 #endif
 
 }
+
+/**
+  * @brief  Clear all information LCD displayed.
+  * @param  None
+  * @retval None
+  */
+
+void Drv_LCD_Clear(void) {
+	Drv_LCD_SendCmd(1 << LCD_CLR);
+	return;
+}
+
 
 /**
   * @brief  Initialize the LCD module.
@@ -179,19 +208,20 @@ void Drv_LCD_Init(void) {
 	Drv_LCD_SendCmd(0x0C);
 //	Drv_LCD_SendCmd(0x06);
 //	Drv_LCD_SendCmd(0x01);
+#elif (LCD_OP_MODE == LCD_MODE_8BIT)
+	_delay_ms(15);
+	LCD_DAT_PORT = 0x00;
+	LCD_CMD_PORT = 0x00;
+	LCD_DAT_PDDR |= (1 << LCD_D7) | (1 << LCD_D6) | (1 << LCD_D5) | (1 << LCD_D4) |
+					(1 << LCD_D3) | (1 << LCD_D2) | (1 << LCD_D1) | (1 << LCD_D0);
+	LCD_CMD_PDDR |= (1 << LCD_RS) | (1 << LCD_RW) | (1 << LCD_EN);
+	
+	Drv_LCD_SendCmd(0x30);		/*!> Parallel 8-bit Mode */
+	Drv_LCD_SendCmd(0x30);
+	Drv_LCD_SendCmd(0x30);
+	Drv_LCD_SendCmd(0x38);		/*!> 8-bit dual line		 */
+	Drv_LCD_SendCmd(0x0C);
 #endif
-
-}
-
-/**
-  * @brief  Clear all information LCD displayed.
-  * @param  None
-  * @retval None
-  */
-
-void Drv_LCD_Clear(void) {
-	Drv_LCD_SendCmd(1 << LCD_CLR);
-	return;
 }
 
 /**

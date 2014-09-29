@@ -5,7 +5,7 @@
 
 #define LCD_MODE_8BIT  		0
 #define LCD_MODE_4BIT		1
-#define LCD_OP_MODE			LCD_MODE_4BIT
+#define LCD_OP_MODE			LCD_MODE_8BIT
 
 #define LCD_RS				0
 #define LCD_RW				1
@@ -17,10 +17,10 @@
 	#define LCD_CMD_PDDR	DDRC
 	#define LCD_DAT_PDDR	DDRC
 #elif 	(LCD_OP_MODE == LCD_MODE_8BIT)
-	#define LCD_CMD_PORT 	PORTA
-	#define LCD_DAT_PORT	PORTB
-	#define LCD_CMD_PDDR	DDRA
-	#define LCD_DAT_PDDR	DDRB
+	#define LCD_CMD_PORT 	PORTB
+	#define LCD_DAT_PORT	PORTC
+	#define LCD_CMD_PDDR	DDRB
+	#define LCD_DAT_PDDR	DDRC
 	#define LCD_D0			0
 	#define LCD_D1			1
 	#define LCD_D2			2

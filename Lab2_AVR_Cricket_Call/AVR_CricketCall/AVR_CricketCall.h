@@ -6,4 +6,10 @@
 
 #include "app_dds.h"
 
+typedef enum {
+	SYS_DDS_CONFIG  = (0),
+	SYS_DDS_RUN	    = (1),
+	SYS_DDS_STOP	= (2),	
+} sys_mode_t;
+
 #endif

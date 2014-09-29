@@ -185,6 +185,12 @@
     <Compile Include="drv_debug.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="drv_keypad.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="drv_keypad.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="drv_lcd.c">
       <SubType>compile</SubType>
     </Compile>
