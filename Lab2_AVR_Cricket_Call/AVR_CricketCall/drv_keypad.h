@@ -28,6 +28,7 @@ typedef enum {
 #define KEY_RD_MSK		0xF0
 
 #define NO_KEY			255
+#define KEY_NUM_0		0
 #define KEY_NUM_1		1
 #define KEY_NUM_2		2
 #define KEY_NUM_3		3
@@ -43,11 +44,12 @@ typedef enum {
 #define KEY_EXT_D		13
 #define KEY_EXT_E		14
 #define KEY_EXT_F		15
-#define KEY_EXT_O		16
 
 #define KEYPAD_PORT		PORTA
 #define KEYPAD_PDDR		DDRA	
 #define KEYPAD_RDPORT	PINA
+
+extern const uint8_t KeyPad_ASCII_Table[16];
 
 void	Drv_KeyPad_Init	(void);
 uint8_t Drv_KeyPadScan	(void);

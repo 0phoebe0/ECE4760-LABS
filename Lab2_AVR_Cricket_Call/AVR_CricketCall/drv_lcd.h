@@ -65,5 +65,27 @@ void Drv_LCD_Home			(void);
 void Drv_LCD_Clear			(void);
 void Drv_LCD_Init			(void);
 void Drv_LCD_Printf			(const char *fmt, ...);
+void Drv_LCD_SendChar		(uint8_t Char);
+
+/* Interrupt Driven LCD Function Declaration */
+
+typedef enum {
+    LCD_SND_CMD,
+    LCD_SND_DAT
+} lcd_dat_type_t;
+
+#define BUFF_SIZE       128
+#define BUFF_SIZE_MSK   (BUFF_SIZE - 1)
+
+typedef struct {
+    uint8_t         LCD_Data;
+    lcd_dat_type_t  LCD_DataType;
+} lcd_buff_t;
+
+void Drv_LCD_IntSendData    (uint8_t data, lcd_dat_type_t data_type);
+void Drv_LCD_TMR_cbFunc     (void);
+void Drv_LCD_IntClear       (void); 
+void Drv_LCD_IntGotoXY      (uint8_t x, uint8_t y);
+void Drv_LCD_IntPrintf      (const char *fmt, ...);
 
 #endif

@@ -1,6 +1,10 @@
 #include "drv_keypad.h"
-
 #include "drv_debug.h"
+
+const uint8_t KeyPad_ASCII_Table[16] = {
+	'0', '1', '2', '3', '4', '5', '6', '7', 
+	'8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+};
 
 void Drv_KeyPad_Init(void) {
 	
@@ -43,7 +47,7 @@ uint8_t Drv_KeyPadScan(void) {
 		case KEY_DEBOUNCE:
 			if (key_value == (KEY_RD_MSK & KEYPAD_RDPORT))/*!> Read KeyPad Again, astill pressed!	*/
 			{
-				Drv_Debug_Printf("%x!\r\n", ((key_line) | key_value));
+//				Drv_Debug_Printf("%x!\r\n", ((key_line) | key_value));
 				switch(key_line | key_value) {
 					case 0b11100001:		key_return = KEY_NUM_1;		break;
 					case 0b11100010:		key_return = KEY_NUM_2;		break;
@@ -60,7 +64,7 @@ uint8_t Drv_KeyPadScan(void) {
 					case 0b10110100:		key_return = KEY_NUM_9;		break;
 					case 0b10111000:		key_return = KEY_EXT_C;		break;
 					
-					case 0b01110001:		key_return = KEY_EXT_O;		break;
+					case 0b01110001:		key_return = KEY_NUM_0;		break;
 					case 0b01110010:		key_return = KEY_EXT_F;		break;
 					case 0b01110100:		key_return = KEY_EXT_E;		break;
 					case 0b01111000:		key_return = KEY_EXT_D;		break;

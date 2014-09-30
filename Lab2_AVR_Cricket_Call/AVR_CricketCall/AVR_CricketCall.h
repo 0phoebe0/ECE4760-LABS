@@ -5,6 +5,7 @@
 #include "drv.h"
 
 #include "app_dds.h"
+#include "app_ui.h"
 
 typedef enum {
 	SYS_DDS_CONFIG  = (0),

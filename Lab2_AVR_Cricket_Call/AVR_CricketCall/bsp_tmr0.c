@@ -12,7 +12,7 @@ void Bsp_TMR0_Init(void) {
 //	TCCR0B =  (0 << WGM02 ) | (0 << CS02  ) | (1 << CS01) | ( 1 << CS00);
 	/*!> Stop Counting Firstly		*/
 	TCCR0B =  (0 << WGM02 ) | (0 << CS02  ) | (0 << CS01) | ( 0 << CS00);	
-	OCR0A = 0;
+	OCR0A = 128;
 	OCR0B = 0x00;
 	
 	/*!> Enable OverFlow ISR / Disable Firstly in Initialization */

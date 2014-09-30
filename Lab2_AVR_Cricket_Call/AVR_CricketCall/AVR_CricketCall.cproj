@@ -131,6 +131,12 @@
     <Compile Include="app_dds.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="app_ui.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="app_ui.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="AVR_CricketCall.c">
       <SubType>compile</SubType>
     </Compile>

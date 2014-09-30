@@ -93,7 +93,7 @@ static void Drv_PutChar(uint8_t Data);
   */
 
 void Drv_Debug_Printf(const char *fmt, ...) {
-	char DataBuff[64] = { 0 };
+	char DataBuff[128] = { 0 };
 	va_list ArgPtr;
 	int8_t  ChCnt = 0;
 	int8_t  ChNbr = 0;
@@ -102,7 +102,7 @@ void Drv_Debug_Printf(const char *fmt, ...) {
 	/* Ref: #define va_start(ap,v) ( ap = (va_list)&v + _INTSIZEOF(v) )  */
 	/* Ref: #define va_end(ap) ( ap = (va_list)0 )  */
 	va_start(ArgPtr, fmt);
-	ChCnt = vsnprintf(DataBuff, 64, fmt, ArgPtr);
+	ChCnt = vsnprintf(DataBuff, 128, fmt, ArgPtr);
 //	ChCnt = vsprintf(DataBuff, fmt, ArgPtr);
 	va_end(ArgPtr);
 

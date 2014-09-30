@@ -39,10 +39,12 @@
 #define  F_CPU               16000000UL
 
 #include "drv_lcd.h"
+#include "drv_debug.h"
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdbool.h>
 
 /** @addtogroup AVR_ATMega128_Demo_LCD_Driver
   * @{
@@ -63,7 +65,6 @@
 
 /* Private function prototypes -----------------------------------------------*/
 
-static void Drv_LCD_SendChar(uint8_t Char);
 static void Drv_LCD_SendCmd	(uint8_t Cmd);
 
 /** @defgroup LCD_Private_Functions
@@ -93,7 +94,7 @@ static void Drv_LCD_SendCmd	(uint8_t Cmd);
   * @retval None
   */
 
-static void Drv_LCD_SendChar(uint8_t Char) {
+void Drv_LCD_SendChar(uint8_t Char) {
 
 #if (LCD_OP_MODE == LCD_MODE_4BIT)
 	LCD_DAT_PORT &= 0x0F;
@@ -116,10 +117,10 @@ static void Drv_LCD_SendChar(uint8_t Char) {
 	LCD_DAT_PORT = Char;
 	LCD_CMD_PORT |=  (1 << LCD_RS);
 	LCD_CMD_PORT |=  (1 << LCD_EN);
-	_delay_ms(2);
+	_delay_ms(1);
 	LCD_CMD_PORT &= ~(1 << LCD_EN);
 	LCD_CMD_PORT &= ~(1 << LCD_RS);	
-	_delay_ms(2);
+	_delay_ms(1);
 #endif
 
 }
@@ -150,9 +151,9 @@ static void Drv_LCD_SendCmd(uint8_t Cmd) {
 #elif (LCD_OP_MODE == LCD_MODE_8BIT)
 	LCD_DAT_PORT = Cmd;
 	LCD_CMD_PORT |= (1 << LCD_EN);
-	_delay_ms(2);
+	_delay_ms(1);
 	LCD_CMD_PORT &= ~(1 << LCD_EN);
-	_delay_ms(2);
+	_delay_ms(1);
 
 #endif
 
@@ -216,11 +217,44 @@ void Drv_LCD_Init(void) {
 					(1 << LCD_D3) | (1 << LCD_D2) | (1 << LCD_D1) | (1 << LCD_D0);
 	LCD_CMD_PDDR |= (1 << LCD_RS) | (1 << LCD_RW) | (1 << LCD_EN);
 	
+    LCD_DAT_PORT = 0x30;
+    LCD_CMD_PORT |= (1 << LCD_EN);
+    _delay_ms(2);
+    LCD_CMD_PORT &= ~(1 << LCD_EN);
+    _delay_ms(2);
+
+    LCD_DAT_PORT = 0x30;
+    LCD_CMD_PORT |= (1 << LCD_EN);
+    _delay_ms(2);
+    LCD_CMD_PORT &= ~(1 << LCD_EN);
+    _delay_ms(2);
+
+    LCD_DAT_PORT = 0x30;
+    LCD_CMD_PORT |= (1 << LCD_EN);
+    _delay_ms(2);
+    LCD_CMD_PORT &= ~(1 << LCD_EN);
+    _delay_ms(2);
+
+    LCD_DAT_PORT = 0x38;
+    LCD_CMD_PORT |= (1 << LCD_EN);
+    _delay_ms(2);
+    LCD_CMD_PORT &= ~(1 << LCD_EN);
+    _delay_ms(2);
+    
+    LCD_DAT_PORT = 0x0C;
+    LCD_CMD_PORT |= (1 << LCD_EN);
+    _delay_ms(2);
+    LCD_CMD_PORT &= ~(1 << LCD_EN);
+    _delay_ms(2);
+
+#if (0)    
 	Drv_LCD_SendCmd(0x30);		/*!> Parallel 8-bit Mode */
 	Drv_LCD_SendCmd(0x30);
 	Drv_LCD_SendCmd(0x30);
 	Drv_LCD_SendCmd(0x38);		/*!> 8-bit dual line		 */
 	Drv_LCD_SendCmd(0x0C);
+#endif
+
 #endif
 }
 
@@ -250,6 +284,7 @@ void Drv_LCD_String(char* Data, uint8_t nBytes) {
 		Drv_LCD_SendChar(Data[BytePos]);
 	}
 }
+
 
 /**
   * @brief  Print out user-defined formatted information.
@@ -289,5 +324,117 @@ void Drv_LCD_GotoXY(uint8_t x, uint8_t y) {
 
 	Drv_LCD_SendCmd((1 << LCD_DDRAM) | DDRAMAddr);
 }
+
+/* Interrupt Driven LCD Functions -------------------------------------------- */
+
+/**
+  *
+  */
+
+static lcd_buff_t       LCD_RingBuffer[BUFF_SIZE];
+volatile uint8_t        BufferHead;
+volatile uint8_t        BufferTail;
+volatile bool           int_snd_flag = false;
+
+void Drv_LCD_IntRun(void) {
+    int_snd_flag = true;
+}
+
+void Drv_LCD_IntPrintf(const char *fmt, ...) {
+    
+    char    DataBuff[64] = { 0 };
+    va_list ArgPtr;
+    int8_t  ChCnt;
+    uint8_t BytePos;    
+
+    va_start(ArgPtr, fmt);
+    ChCnt = vsnprintf(DataBuff, 64, fmt, ArgPtr);
+    va_end(ArgPtr);
+    
+    for (BytePos = 0; BytePos < ChCnt; BytePos++) {
+        Drv_LCD_IntSendData(DataBuff[BytePos], LCD_SND_DAT);
+    }
+}
+
+void Drv_LCD_IntSendData(uint8_t data, lcd_dat_type_t data_type) {
+    uint8_t next_head;
+
+    next_head = (BufferHead + 1) & BUFF_SIZE_MSK;
+
+    if (next_head != BufferTail) {
+        LCD_RingBuffer[BufferHead].LCD_Data = data;
+        LCD_RingBuffer[BufferHead].LCD_DataType = data_type;
+        BufferHead = next_head;
+    }
+    else {
+        /*!< Buffer is full! */
+    }
+}
+
+void Drv_LCD_IntGotoXY(uint8_t x, uint8_t y) {
+
+    uint8_t DDRAMAddr;
+
+    switch(y) {
+        case 	0: DDRAMAddr = LCD_LINE0_DDRAMADDR + x; break;
+        case 	1: DDRAMAddr = LCD_LINE1_DDRAMADDR + x; break;
+        case 	2: DDRAMAddr = LCD_LINE2_DDRAMADDR + x; break;
+        case 	3: DDRAMAddr = LCD_LINE3_DDRAMADDR + x; break;
+        default	 : DDRAMAddr = LCD_LINE0_DDRAMADDR + x;
+    }
+
+    Drv_LCD_IntSendData(((1 << LCD_DDRAM) | DDRAMAddr), LCD_SND_CMD);
+}
+
+void Drv_LCD_IntClear(void) {
+    Drv_LCD_IntSendData((1 << LCD_CLR), LCD_SND_CMD);
+    return;
+}
+
+static uint16_t tmr_quota;
+static uint8_t  send_stat = 0;
+
+void Drv_LCD_TMR_cbFunc(void) {
+
+    if (BufferTail != BufferHead) {
+        
+        switch (send_stat) {
+
+            case 0:
+                LCD_DAT_PORT = LCD_RingBuffer[BufferTail].LCD_Data;
+                if (LCD_RingBuffer[BufferTail].LCD_DataType == LCD_SND_DAT)
+                    LCD_CMD_PORT |=  (1 << LCD_RS);
+                else
+                    LCD_CMD_PORT &= ~(1 << LCD_RS);
+                LCD_CMD_PORT |=  (1 << LCD_EN); 
+                send_stat ++;   
+            break;
+
+            case 1:
+                tmr_quota ++;
+                if (tmr_quota >= 64) {
+                    tmr_quota = 0;
+                    LCD_CMD_PORT &= ~(1 << LCD_RS);
+                    LCD_CMD_PORT &= ~(1 << LCD_EN);
+                    send_stat ++;
+                }
+            break;
+            
+            case 2:
+                tmr_quota ++;
+                if (tmr_quota >= 64) {
+                    tmr_quota = 0;
+                    send_stat = 0;
+                    int_snd_flag = false;
+                    BufferTail = (BufferTail + 1) & BUFF_SIZE_MSK;
+                }
+            break;
+            
+            default:
+            break;
+        }
+    }
+}
+
 
 /************************ (C) COPYRIGHT Cornell ECE4760 ********END OF FILE****/

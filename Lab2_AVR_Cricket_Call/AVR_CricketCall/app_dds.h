@@ -4,6 +4,10 @@
 #include "drv_led.h"
 #include "bsp_tmr0.h"
 
+#include "drv_lcd.h"
+
+#include <stdbool.h>
+
 /* For a 32-bit DDS accumulator, 16000000Hz / 256 = 62.5KHz
    increment_adj = 2^32 * 256 * Freq / 16000000 = 68719 * Freq
    Freq = 1000Hz, increment_adj = 68719000 */
@@ -21,8 +25,10 @@ typedef enum {
 	SYLLABLE_STOP = (4)
 } syllableplay_t;
 
+extern bool	 dds_play_ctrl;
+
 void App_DDS_Init(void);
-void App_DDS_Para_Calc(void);
+void App_DDS_Para_Calc(uint16_t *para_arr);
 void App_DDS_Task_Exec(void);
 
 #endif
