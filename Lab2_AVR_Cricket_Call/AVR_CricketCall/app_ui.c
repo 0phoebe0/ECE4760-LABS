@@ -192,16 +192,13 @@ ui_config_t App_UserInput_Handler(uint8_t* key_value, uint16_t *ui_refresh) {
                 switch (refresh_index) {
                     case 0:
                     case 2:
-                    case 3:
-                        Drv_LCD_Printf("VAL: %d ms", usr_conf_para[refresh_index]);
+                    case 3: Drv_LCD_Printf("VAL: %d ms", usr_conf_para[refresh_index]);
                     break;
 
-                    case 4:
-                        Drv_LCD_Printf("VAL: %d Hz", usr_conf_para[refresh_index]);
+                    case 4: Drv_LCD_Printf("VAL: %d Hz", usr_conf_para[refresh_index]);
                     break;
 
-                    case 1:
-                        Drv_LCD_Printf("VAL: %d   ", usr_conf_para[refresh_index]);
+                    case 1: Drv_LCD_Printf("VAL: %d   ", usr_conf_para[refresh_index]);
                     break;
                 }
 #endif

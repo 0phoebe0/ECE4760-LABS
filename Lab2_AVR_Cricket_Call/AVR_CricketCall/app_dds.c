@@ -77,7 +77,7 @@ void App_DDS_Para_Calc(uint16_t *para_arr) {
         Drv_Debug_Printf("Wrong Parameter!\r\n");
     }
 
-	Drv_Debug_Printf("dds_increment: %ld, ramp_down_sta: %d, ramp_down_sto: %x\r\n", dds_increment, ramp_down_start, ramp_down_stop);
+	Drv_Debug_Printf("dds_increment: %ld, ramp_down_sta: %d, ramp_down_sto: %d\r\n", dds_increment, ramp_down_start, ramp_down_stop);
 	Drv_Debug_Printf("Parameter Initialized!\r\n");
 	dds_synthesis_flag  = true;
 	dds_play_ctrl		= true;
@@ -169,8 +169,9 @@ void Bsp_TMR0_OVF_cbISR(void) {
 			rampt_index++;
 		else if (sample_cntr > SINE_RAMP_UP_END && sample_cntr <= ramp_down_start)
 			rampt_index = 255;
-        else if (sample_cntr > ramp_down_start && sample_cntr <= ramp_down_stop)
-            rampt_index--;
+        else if (sample_cntr > ramp_down_start && sample_cntr <= ramp_down_stop) {
+			if (rampt_index) rampt_index--;
+		}
 		else if (sample_cntr > ramp_down_stop) { 
             syllable_play_over = true;
             sample_cntr = 0;
