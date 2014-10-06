@@ -16,6 +16,8 @@ RS:  PORTB.0
 RW:  PORTB.1
 EN:  PORTB.2
 
+Please refer to LAB1 handout for LCD module pin definition.
+
 Speaker: PORTB.3
 
 
