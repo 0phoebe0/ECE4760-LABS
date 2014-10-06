@@ -158,10 +158,13 @@ ui_config_t App_UserInput_Handler(uint8_t* key_value, uint16_t *ui_refresh) {
 			if (*key_value == KEY_EXT_D) {
 				ui_conf_stat = UI_DISP_HINT;
 			}
-			if (*ui_refresh >= 62500) {
+			if ((*ui_refresh) % 64 == 0) {
+				Drv_LCD_TMR_cbFunc();
+			}
+			if (*ui_refresh >= 64000) {
 				*ui_refresh = 0;
 				
-#if 0
+#if 1
                 Drv_LCD_IntClear();
 				Drv_LCD_IntGotoXY(0, 0);
 				Drv_LCD_IntPrintf((void*)msg_config_array[refresh_index]);
@@ -184,7 +187,7 @@ ui_config_t App_UserInput_Handler(uint8_t* key_value, uint16_t *ui_refresh) {
 				
 #endif
 
-#if 1
+#if 0
                 Drv_LCD_Clear();
                 Drv_LCD_GotoXY(0, 0);
                 Drv_LCD_Printf((void*)msg_config_array[refresh_index]);

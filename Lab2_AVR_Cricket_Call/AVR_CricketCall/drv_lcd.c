@@ -383,11 +383,11 @@ void Drv_LCD_IntGotoXY(uint8_t x, uint8_t y) {
         default	 : DDRAMAddr = LCD_LINE0_DDRAMADDR + x;
     }
 
-    Drv_LCD_IntSendData(((1 << LCD_DDRAM) | DDRAMAddr), LCD_SND_CMD);
+    Drv_LCD_IntSendData((uint8_t)((1 << LCD_DDRAM) | DDRAMAddr), LCD_SND_CMD);
 }
 
 void Drv_LCD_IntClear(void) {
-    Drv_LCD_IntSendData((1 << LCD_CLR), LCD_SND_CMD);
+    Drv_LCD_IntSendData((uint8_t)(1 << LCD_CLR), LCD_SND_CMD);
     return;
 }
 
@@ -401,39 +401,46 @@ void Drv_LCD_TMR_cbFunc(void) {
         switch (send_stat) {
 
             case 0:
-                LCD_DAT_PORT = LCD_RingBuffer[BufferTail].LCD_Data;
-                if (LCD_RingBuffer[BufferTail].LCD_DataType == LCD_SND_DAT)
-                    LCD_CMD_PORT |=  (1 << LCD_RS);
-                else
-                    LCD_CMD_PORT &= ~(1 << LCD_RS);
-                LCD_CMD_PORT |=  (1 << LCD_EN); 
-                send_stat ++;   
+				tmr_quota ++;
+				if (tmr_quota >= 0) {
+					tmr_quota = 0;
+					LCD_DAT_PORT = LCD_RingBuffer[BufferTail].LCD_Data;
+					if (LCD_RingBuffer[BufferTail].LCD_DataType == LCD_SND_DAT)
+						LCD_CMD_PORT |=  (1 << LCD_RS);
+					else
+						LCD_CMD_PORT &= ~(1 << LCD_RS);
+					LCD_CMD_PORT |=  (1 << LCD_EN); 
+					send_stat ++; 
+				}
             break;
 
             case 1:
                 tmr_quota ++;
-                if (tmr_quota >= 64) {
+                if (tmr_quota >= 0) {
                     tmr_quota = 0;
-                    LCD_CMD_PORT &= ~(1 << LCD_RS);
                     LCD_CMD_PORT &= ~(1 << LCD_EN);
+					LCD_CMD_PORT &= ~(1 << LCD_RS);
                     send_stat ++;
                 }
             break;
             
             case 2:
                 tmr_quota ++;
-                if (tmr_quota >= 64) {
+                if (tmr_quota >= 0) {
                     tmr_quota = 0;
                     send_stat = 0;
-                    int_snd_flag = false;
+//                   int_snd_flag = false;
                     BufferTail = (BufferTail + 1) & BUFF_SIZE_MSK;
-                }
+                } 
             break;
             
             default:
             break;
         }
     }
+	else {
+		Drv_Debug_Printf("Empty!\r\n");
+	}
 }
 
 

@@ -101,16 +101,18 @@ void App_DDS_PlaySyllable(void) {
 		break;
 		
 		case SYLLABLE_PREP:
+			Drv_Debug_Printf("PREP!\r\n");
 			dds_synthesis_flag = true;
 //			TMR0_CLR_CNTR();
 			dds_play_status = SYLLABLE_PLAY;
 		break;
 		
 		case SYLLABLE_PLAY:
-//			if (syllable_tmr_count >= ((syllable_duration + \
-//									   (syllable_rept_interval) * syllable_play_cntr) * 62.5))
+/*			if (syllable_tmr_count >= ((syllable_duration + \
+									   (syllable_rept_interval) * syllable_play_cntr) * 62.5))*/
             if (syllable_play_over)
             {
+				Drv_Debug_Printf("Over!\r\n");
                 syllable_play_over = false;
 				dds_synthesis_flag = false;
 				dds_play_status = SYLLABLE_OVER;
@@ -174,6 +176,7 @@ void Bsp_TMR0_OVF_cbISR(void) {
 		}
 		else if (sample_cntr > ramp_down_stop) { 
             syllable_play_over = true;
+			dds_synthesis_flag = false;
             sample_cntr = 0;
 			rampt_index = 0;
         }
@@ -185,8 +188,8 @@ void Bsp_TMR0_OVF_cbISR(void) {
 	ui_refresh_frame ++;
 	tmr_counter ++;
 	
-#if 0
-    Drv_LCD_TMR_cbFunc();
+#if 1
+    
 #endif    
 
 	if (++SysIndCntr == 62500) {
