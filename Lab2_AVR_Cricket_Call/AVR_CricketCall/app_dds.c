@@ -40,6 +40,12 @@ static volatile bool     syllable_play_over = false;
 
 bool	 dds_play_ctrl = false;
 
+/**
+  * @brief  Initialize sinewave table and ramp table. 
+  * @param  None.
+  * @retval None.
+  */
+
 void App_DDS_Init(void) {
 	
 	uint16_t sineIndex = 0;
@@ -53,6 +59,12 @@ void App_DDS_Init(void) {
 		rampTable[sineIndex] = (sineIndex >> 1);
 	}
 }
+
+/**
+  * @brief  Calculate DDS parameters based on user inputs.
+  * @param  para_arr: pointer to the user input value array.
+  * @retval None.
+  */
 
 void App_DDS_Para_Calc(uint16_t *para_arr) {
 	
