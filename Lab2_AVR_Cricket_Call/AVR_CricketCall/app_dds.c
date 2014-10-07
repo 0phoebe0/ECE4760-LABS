@@ -63,7 +63,7 @@ void App_DDS_Para_Calc(uint16_t *para_arr) {
 	syllable_rept_interval	= *(para_arr + 3);
 	burst_freq				= *(para_arr + 4);
 	    
-    cli();
+    cli(); 
     Drv_Debug_Printf("Parameters: CHRP INT: %d, SYB NO.:%d, SYB_DUR:%d, SYB REPT:%d, BUR_FREQ:%d\r\n",
                       chirp_rept_interval, syllable_number, syllable_duration, syllable_rept_interval, burst_freq);
 	/*!> Must do some kind of verification to check whether the parameters are right */
@@ -85,12 +85,20 @@ void App_DDS_Para_Calc(uint16_t *para_arr) {
     sei();
 } 
 
+/**
+  * @brief  DDS synthesize state machine: Core Time Manipulate Function 
+  * @param  None.
+  * @retval None.
+  */
+
 void App_DDS_PlaySyllable(void) {
 	
+	/*!> How many syllables have been played */
 	static uint8_t syllable_play_cntr;
 	
 	switch(dds_play_status) {
 		
+		/*!> Init all parameters at the new chirp play		*/
 		case SYLLABLE_INIT:
 			syllable_tmr_count = 0;
 			syllable_play_cntr = 0;
@@ -100,37 +108,40 @@ void App_DDS_PlaySyllable(void) {
 			dds_play_status = SYLLABLE_PREP;
 		break;
 		
+		/*!> Turn on DDS synthesis in the ISR call-back		*/
 		case SYLLABLE_PREP:
-			Drv_Debug_Printf("PREP!\r\n");
+//			Drv_Debug_Printf("PREP!\r\n");
 			dds_synthesis_flag = true;
-//			TMR0_CLR_CNTR();
 			dds_play_status = SYLLABLE_PLAY;
 		break;
 		
+		/*!> Check whether one syllable is finished or not */
 		case SYLLABLE_PLAY:
-/*			if (syllable_tmr_count >= ((syllable_duration + \
-									   (syllable_rept_interval) * syllable_play_cntr) * 62.5))*/
             if (syllable_play_over)
             {
-				Drv_Debug_Printf("Over!\r\n");
+//				Drv_Debug_Printf("Over!\r\n");
+				/*!> Increment the played syllable counter */
+				syllable_play_cntr ++;
                 syllable_play_over = false;
 				dds_synthesis_flag = false;
 				dds_play_status = SYLLABLE_OVER;
 			}
 		break;
 		
+		/*!> Syllable is over, mute during the gap period */
 		case SYLLABLE_OVER:
-			if (syllable_tmr_count >= (syllable_rept_interval * (syllable_play_cntr + 1) * 62.5)) 
-            {
-				syllable_play_cntr ++;
+			if (syllable_tmr_count >= (uint16_t)(syllable_rept_interval * \
+												 syllable_play_cntr     * 62.5)) 
+            {			
 				if (syllable_play_cntr < syllable_number)
 					dds_play_status = SYLLABLE_PREP;
-				else {
+				else
 					dds_play_status = SYLLABLE_STOP;
-				}
 			}
 		break;
 		
+		/*!> Check whether one chirp is finished or not,
+		     Mute the output during this period of time */
 		case SYLLABLE_STOP:
 			if (syllable_tmr_count >= (chirp_rept_interval * 62.5)) {
 				dds_play_status = SYLLABLE_INIT;
@@ -140,14 +151,21 @@ void App_DDS_PlaySyllable(void) {
 	
 }
 
+/**
+  * @brief  DDS Task Executed in main loop, control the whole Synthesis Process. 
+  * @param  None.
+  * @retval None.
+  */
+
 void App_DDS_Task_Exec(void) {
 	
 	if (dds_play_ctrl) {
-		App_DDS_PlaySyllable();
+		/*!> Run DDS state machine according to user control */
+		App_DDS_PlaySyllable();			
 	}
 	else {
+		/*!> Stop DDS synthesis */
 		dds_synthesis_flag = false;
-//		TMR0_STOP_COUNT();		/*!> Just for testing purpose! */
 	}
 }
 
@@ -155,18 +173,28 @@ void Bsp_TMR0_CTC_cbISR(void) {
 	return;
 }
 
-/*!> TMR0 is initialized @ 16MHz, Fast PWM Mode, 16000000 / 256 = 62500 */
+/**
+  * @brief  TMR0 overflow interrupt service routine call-back function.
+			TMR0 is initialized @ 16MHz, Fast PWM Mode, 16000000 / 256 = 62500 
+  * @param  None.
+  * @retval None.
+  */
+
 void Bsp_TMR0_OVF_cbISR(void) {
 	
 	if (dds_synthesis_flag) {
+		/*!> Get the phase value */
 		dds_accumulator += dds_increment;
-		dds_accum_high8 =  (uint8_t)(dds_accumulator >> 24);
-		
+		/*!> find eligible elements in sine wave lookup table */									
+		dds_accum_high8 =  (uint8_t)(dds_accumulator >> 24);				
+		/*!> Update Output Compare Register */
 		OCR0A = 128 + (uint8_t)((uint16_t)( sineTable[dds_accum_high8] * \
 		                                    rampTable[rampt_index]) >> 7 );
 		
+		/*!> Syllable Play Control Sample Counter */
 		sample_cntr ++;
 		
+		/*!> Amplitude modulation */
 		if		(sample_cntr <= SINE_RAMP_UP_END)
 			rampt_index++;
 		else if (sample_cntr > SINE_RAMP_UP_END && sample_cntr <= ramp_down_start)
@@ -175,23 +203,24 @@ void Bsp_TMR0_OVF_cbISR(void) {
 			if (rampt_index) rampt_index--;
 		}
 		else if (sample_cntr > ramp_down_stop) { 
-            syllable_play_over = true;
+			/*!> Syllable play over, shut off dds synthesis */
+            syllable_play_over = true;				
 			dds_synthesis_flag = false;
-            sample_cntr = 0;
+			
+			/*!> Clear accumulating variables				*/
+            sample_cntr = 0;						
 			rampt_index = 0;
         }
 	}
 	else
-		OCR0A = 128;
+		/*!> Mute the output audio */
+		OCR0A = 128;								
 	
 	syllable_tmr_count ++;
 	ui_refresh_frame ++;
 	tmr_counter ++;
 	
-#if 1
-    
-#endif    
-
+	/*!> LED blinking task: System heartbeat */
 	if (++SysIndCntr == 62500) {
 		Drv_LED_Toggle();
 		SysIndCntr = 0;

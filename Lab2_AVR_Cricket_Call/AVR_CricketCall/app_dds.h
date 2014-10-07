@@ -9,6 +9,14 @@
 #include <stdbool.h>
 
 /* For a 32-bit DDS accumulator, 16000000Hz / 256 = 62.5KHz
+   
+   fo = M * fc / 2^n
+   M:  amount of the phase accumulator is incremented each clock cycle;
+   fc: clock frequency;
+   fo: output clock frequency.
+   
+   n = 32, fo = 1KHz, fc = 62.5KHz
+   
    increment_adj = 2^32 * 256 * Freq / 16000000 = 68719 * Freq
    Freq = 1000Hz, increment_adj = 68719000 */
 #define DDS32_INCREMENT			68719000UL

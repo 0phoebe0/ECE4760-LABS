@@ -44,6 +44,7 @@ void App_UI_Display_Welcome(void) {
 
 /* If this variable was config as local parameter, exception happens 
    Find this problem source! It's something relevant about compiler */
+
 static volatile uint8_t para_conf_ptr;   
 
 ui_config_t App_UserInput_Handler(uint8_t* key_value, uint16_t *ui_refresh) {
@@ -69,7 +70,6 @@ ui_config_t App_UserInput_Handler(uint8_t* key_value, uint16_t *ui_refresh) {
 			Drv_LCD_GotoXY(0, 1);
 			Drv_LCD_Printf(MSG_CONFIG_INP_LINE);
 			inp_digits = 0;
-			
 			ui_conf_stat = UI_GET_INPUT;
 		break;
 		
@@ -132,9 +132,6 @@ ui_config_t App_UserInput_Handler(uint8_t* key_value, uint16_t *ui_refresh) {
 				*key_value = NO_KEY;
 			}
 		break;	
-		
-		case UI_CONF_PARA:
-		break;
 		
 		case UI_CONF_OVER:		
 			for (dbg_tmp = 0; dbg_tmp < 5; dbg_tmp++) {
