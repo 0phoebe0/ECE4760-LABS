@@ -76,6 +76,7 @@ typedef enum {
 
 #define BUFF_SIZE       128
 #define BUFF_SIZE_MSK   (BUFF_SIZE - 1)
+#define TIME_CONSTRAINT 0
 
 typedef struct {
     uint8_t         LCD_Data;

@@ -402,7 +402,7 @@ void Drv_LCD_TMR_cbFunc(void) {
 
             case 0:
 				tmr_quota ++;
-				if (tmr_quota >= 0) {
+				if (tmr_quota >= TIME_CONSTRAINT) {
 					tmr_quota = 0;
 					LCD_DAT_PORT = LCD_RingBuffer[BufferTail].LCD_Data;
 					if (LCD_RingBuffer[BufferTail].LCD_DataType == LCD_SND_DAT)
@@ -416,7 +416,7 @@ void Drv_LCD_TMR_cbFunc(void) {
 
             case 1:
                 tmr_quota ++;
-                if (tmr_quota >= 0) {
+                if (tmr_quota >= TIME_CONSTRAINT) {
                     tmr_quota = 0;
                     LCD_CMD_PORT &= ~(1 << LCD_EN);
 					LCD_CMD_PORT &= ~(1 << LCD_RS);
@@ -426,7 +426,7 @@ void Drv_LCD_TMR_cbFunc(void) {
             
             case 2:
                 tmr_quota ++;
-                if (tmr_quota >= 0) {
+                if (tmr_quota >= TIME_CONSTRAINT) {
                     tmr_quota = 0;
                     send_stat = 0;
 //                   int_snd_flag = false;
